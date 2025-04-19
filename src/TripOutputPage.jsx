@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Button, Spinner, Card } from "react-bootstrap";
+import { Container, Button, Spinner } from "react-bootstrap";
+import Itinerary from "./components/Itinerary.js";
 
 const TripOutputPage = () => {
     const location = useLocation();
@@ -9,14 +10,16 @@ const TripOutputPage = () => {
 
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (!destination || !travelDays || !travelStyle || !budget) {
+            setError("Missing input data. Please fill all fields.");
             setLoading(false);
             return;
         }
 
-        // Call FastAPI backend to generate itinerary
+        setLoading(true);
         fetch("http://127.0.0.1:8000/generate-itinerary", {
             method: "POST",
             headers: {
@@ -29,13 +32,18 @@ const TripOutputPage = () => {
                 budget,
             }),
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
             .then((data) => {
-                setItinerary(data.itinerary);
+                console.log("Backend response:", data); // Log the full response
+                setItinerary(data.itinerary ? data.itinerary : data); // Handle both cases
                 setLoading(false);
             })
             .catch((error) => {
-                console.error("Error fetching itinerary:", error);
+                console.error("Fetch error:", error); // Log the error
+                setError("Could not generate itinerary. Please try again or check the backend.");
                 setLoading(false);
             });
     }, [destination, travelDays, travelStyle, budget]);
@@ -55,11 +63,10 @@ const TripOutputPage = () => {
                 <Spinner animation="border" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
+            ) : error ? (
+                <p className="text-danger">{error}</p>
             ) : itinerary ? (
-                <Card className="p-3">
-                    <h2>Generated Itinerary</h2>
-                    <pre className="text-start">{itinerary}</pre>
-                </Card>
+                <Itinerary itineraryData={itinerary} />
             ) : (
                 <p className="text-danger">No itinerary generated. Try again!</p>
             )}

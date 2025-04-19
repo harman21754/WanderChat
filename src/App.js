@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
-import { Container, Navbar, Form, Button, Row, Col, Card, ListGroup } from "react-bootstrap";
+import { Container, Navbar, Form, Button, Row, Col, Card, ListGroup, Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import TripOutputPage from "./TripOutputPage";
+import TripOutputPage from "./TripOutputPage.jsx";
 
 const WanderChat = () => {
     const navigate = useNavigate();
@@ -11,13 +11,16 @@ const WanderChat = () => {
     const [travelStyle, setTravelStyle] = useState("");
     const [budget, setBudget] = useState("");
     const [suggestions, setSuggestions] = useState([]);
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
     const fetchDestinations = async (input) => {
-        if (input.length < 0) {
+        if (!input || input.length <= 0) {
             setSuggestions([]);
+            setLoadingSuggestions(false);
             return;
         }
 
+        setLoadingSuggestions(true);
         const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${input}&countryIds=IN&limit=5`;
         const options = {
             method: "GET",
@@ -29,10 +32,14 @@ const WanderChat = () => {
 
         try {
             const response = await fetch(url, options);
+            if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
             setSuggestions(data.data.map((city) => city.city));
         } catch (error) {
             console.error("Error fetching destinations:", error);
+            setSuggestions([]);
+        } finally {
+            setLoadingSuggestions(false);
         }
     };
 
@@ -46,8 +53,6 @@ const WanderChat = () => {
             alert("Please fill all fields before submitting!");
             return;
         }
-
-        // Navigate to TripOutputPage with form data
         navigate("/output", { state: { destination, travelDays, travelStyle, budget } });
     };
 
@@ -63,19 +68,24 @@ const WanderChat = () => {
 
             <Container className="text-center mt-5">
                 <h1 className="fw-bold">WanderChat</h1>
-                <p className="text-primary">
-                    Plan your dream trip with personalized itineraries.
-                </p>
+                <p className="text-primary">Plan your dream trip with personalized itineraries.</p>
             </Container>
 
             <Container className="text-left mt-4">
                 <Row className="justify-content-center">
                     <Col md={3} className="mb-2">
                         <Form.Label className="fst-italic">Travel Days</Form.Label>
-                        <Form.Control as="select" className="text-center" value={travelDays} onChange={(e) => setTravelDays(e.target.value)}>
+                        <Form.Control
+                            as="select"
+                            className="text-center"
+                            value={travelDays}
+                            onChange={(e) => setTravelDays(e.target.value)}
+                        >
                             <option value="">Choose travel days</option>
                             {[...Array(7)].map((_, i) => (
-                                <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? "day" : "days"}</option>
+                                <option key={i + 1} value={i + 1}>
+                                    {i + 1} {i === 0 ? "day" : "days"}
+                                </option>
                             ))}
                         </Form.Control>
                     </Col>
@@ -91,6 +101,7 @@ const WanderChat = () => {
                                 fetchDestinations(e.target.value);
                             }}
                         />
+                        {loadingSuggestions && <Spinner animation="border" size="sm" className="ms-2" />}
                         {suggestions.length > 0 && (
                             <ListGroup className="position-absolute w-100 shadow bg-white">
                                 {suggestions.map((city, index) => (
@@ -103,7 +114,12 @@ const WanderChat = () => {
                     </Col>
                     <Col md={3} className="mb-2">
                         <Form.Label className="fst-italic">Travel Style</Form.Label>
-                        <Form.Control as="select" className="text-center" value={travelStyle} onChange={(e) => setTravelStyle(e.target.value)}>
+                        <Form.Control
+                            as="select"
+                            className="text-center"
+                            value={travelStyle}
+                            onChange={(e) => setTravelStyle(e.target.value)}
+                        >
                             <option value="">Choose travel style</option>
                             <option value="Adventure">Adventure</option>
                             <option value="Relax">Relax</option>
@@ -112,12 +128,20 @@ const WanderChat = () => {
                     </Col>
                     <Col md={3} className="mb-2">
                         <Form.Label className="fst-italic">Budget (INR)</Form.Label>
-                        <Form.Control type="number" placeholder="Enter budget in ₹" className="text-center" value={budget} onChange={(e) => setBudget(e.target.value)} />
+                        <Form.Control
+                            type="number"
+                            placeholder="Enter budget in ₹"
+                            className="text-center"
+                            value={budget}
+                            onChange={(e) => setBudget(e.target.value)}
+                        />
                     </Col>
                 </Row>
                 <Row className="justify-content-end mt-3">
                     <Col md={3}>
-                        <Button variant="primary" className="w-100 btn-lg py-2 px-4" onClick={handleRunClick}>✨ Run</Button>
+                        <Button variant="primary" className="w-100 btn-lg py-2 px-4" onClick={handleRunClick}>
+                            ✨ Run
+                        </Button>
                     </Col>
                 </Row>
             </Container>
@@ -131,7 +155,7 @@ const WanderChat = () => {
                         { name: "Goa Beach", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6LzV3PwBVW52b-QcS87Xx2Dohv8_sEr--sA&s", link: "https://www.google.com/search?q=goa+beaches" },
                         { name: "Jaipur", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjcT9rS_ezSSzG9PRIRmMSh2zC85tzzurPNQ&s", link: "https://www.google.com/search?q=jaipur" },
                         { name: "Kerala Backwaters", img: "https://miro.medium.com/v2/resize:fit:800/1*MGLoMtfmdM0uWvckntBlOA.png", link: "https://www.google.com/search?q=kerala+backwaters" },
-                        { name: "Darjeeling", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTADtryC1RUa9fkVQ1RqoxJ20bboW6IB3_UUQ&s", link: "https://www.google.com/search?q=darjeeling" }
+                        { name: "Darjeeling", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTADtryC1RUa9fkVQ1RqoxJ20bboW6IB3_UUQ&s", link: "https://www.google.com/search?q=darjeeling" },
                     ].map((place, index) => (
                         <Col key={index} md={4} className="mb-3">
                             <Card className="shadow-sm">
