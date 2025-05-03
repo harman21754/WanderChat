@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import { Container, Navbar, Form, Button, Row, Col, Card, ListGroup, Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { debounce } from "lodash";
 import TripOutputPage from "./TripOutputPage.jsx";
 
 const WanderChat = () => {
@@ -13,35 +14,34 @@ const WanderChat = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
-    const fetchDestinations = async (input) => {
-        if (!input || input.length <= 0) {
-            setSuggestions([]);
-            setLoadingSuggestions(false);
-            return;
-        }
+    const fetchDestinations = useCallback(
+        debounce(async (input) => {
+            if (!input) {
+                setSuggestions([]);
+                setLoadingSuggestions(false);
+                return;
+            }
 
-        setLoadingSuggestions(true);
-        const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${input}&countryIds=IN&limit=5`;
-        const options = {
-            method: "GET",
-            headers: {
-                "X-RapidAPI-Key": "1391e84fd4msh31adf52fcaf6b2bp1fbf24jsn290983dc2bab",
-                "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
-            },
-        };
-
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) throw new Error("Network response was not ok");
-            const data = await response.json();
-            setSuggestions(data.data.map((city) => city.city));
-        } catch (error) {
-            console.error("Error fetching destinations:", error);
-            setSuggestions([]);
-        } finally {
-            setLoadingSuggestions(false);
-        }
-    };
+            setLoadingSuggestions(true);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+            const url = `${backendUrl}/fetch-cities?namePrefix=${encodeURIComponent(input)}`;
+            console.log("Fetching destinations from:", url);
+            try {
+                const response = await fetch(url);
+                console.log("Response status:", response.status);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+                console.log("Response data:", data);
+                setSuggestions(data.data ? data.data.map((city) => city.city || city.name) : []);
+            } catch (error) {
+                console.error("Error fetching destinations:", error.message);
+                setSuggestions([]);
+            } finally {
+                setLoadingSuggestions(false);
+            }
+        }, 300),
+        []
+    );
 
     const handleSelectSuggestion = (city) => {
         setDestination(city);
@@ -50,7 +50,15 @@ const WanderChat = () => {
 
     const handleRunClick = () => {
         if (!destination || !travelDays || !travelStyle || !budget) {
-            alert("Please fill all fields before submitting!");
+            alert("Please fill all fields!");
+            return;
+        }
+        if (isNaN(budget) || budget <= 0) {
+            alert("Budget must be a positive number!");
+            return;
+        }
+        if (isNaN(travelDays) || travelDays <= 0) {
+            alert("Travel days must be a positive number!");
             return;
         }
         navigate("/output", { state: { destination, travelDays, travelStyle, budget } });
@@ -153,9 +161,9 @@ const WanderChat = () => {
                         { name: "Manali", img: "https://www.clubmahindra.com/blog/media/section_images/blog-topic-6530ecb63a76c89.jpg", link: "https://www.google.com/search?q=manali" },
                         { name: "Shimla", img: "https://i0.wp.com/jannattravelguru.com/wp-content/uploads/2021/10/himachal-pradesh-shimla-147616947938o.webp", link: "https://www.google.com/search?q=shimla" },
                         { name: "Goa Beach", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6LzV3PwBVW52b-QcS87Xx2Dohv8_sEr--sA&s", link: "https://www.google.com/search?q=goa+beaches" },
-                        { name: "Jaipur", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjcT9rS_ezSSzG9PRIRmMSh2zC85tzzurPNQ&s", link: "https://www.google.com/search?q=jaipur" },
+                        { name: "Jaipur", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn9GcRjcT9rS_ezSSzG9PRIRmMSh2zC85tzzurPNQ&s", link: "https://www.google.com/search?q=jaipur" },
                         { name: "Kerala Backwaters", img: "https://miro.medium.com/v2/resize:fit:800/1*MGLoMtfmdM0uWvckntBlOA.png", link: "https://www.google.com/search?q=kerala+backwaters" },
-                        { name: "Darjeeling", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTADtryC1RUa9fkVQ1RqoxJ20bboW6IB3_UUQ&s", link: "https://www.google.com/search?q=darjeeling" },
+                        { name: "Darjeeling", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn9GcTADtryC1RUa9fkVQ1RqoxJ20bboW6IB3_UUQ&s", link: "https://www.google.com/search?q=darjeeling" },
                     ].map((place, index) => (
                         <Col key={index} md={4} className="mb-3">
                             <Card className="shadow-sm">
