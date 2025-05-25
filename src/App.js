@@ -23,7 +23,13 @@ const WanderChat = () => {
             }
 
             setLoadingSuggestions(true);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+            const backendUrl = process.env.REACT_APP_BACKEND_URL;
+            if (!backendUrl) {
+                console.error("REACT_APP_BACKEND_URL is not defined!");
+                setLoadingSuggestions(false);
+                setSuggestions([]);
+                return;
+            }
             const url = `${backendUrl}/fetch-cities?namePrefix=${encodeURIComponent(input)}`;
             console.log("Fetching destinations from:", url);
             try {
