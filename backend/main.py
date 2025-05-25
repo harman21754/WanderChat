@@ -32,7 +32,7 @@ def generate_ai_itinerary(destination, travel_days, travel_style, budget):
         if travel_days <= 0 or budget <= 0:
             return "Error: Travel days and budget must be positive numbers"
         start_time = time.time()
-        model = genai.GenerativeModel("gemini-1.5-pro")
+        model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = f"Generate a detailed {travel_days}-day itinerary for {destination} with a {travel_style} travel style, strictly adhering to a budget of {budget} INR. Provide a specific day-by-day schedule with exact activities, locations, and estimated costs (e.g., 'Day 1: 9:00 AM - Visit Golden Temple, free entry; 12:00 PM - Lunch at Kesar Da Dhaba, ₹300'). Exclude flights and include at least 3 activities per day with timings. End with 3 specific budget-saving tips tailored to this trip."
         response = model.generate_content(prompt)
         end_time = time.time()

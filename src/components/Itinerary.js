@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, ListGroup, Row, Col } from "react-bootstrap";
+import { Card, ListGroup} from "react-bootstrap";
 
 const Itinerary = ({ itineraryData }) => {
     // Parse the itinerary data and clean up Markdown formatting
@@ -10,46 +10,38 @@ const Itinerary = ({ itineraryData }) => {
         let budgetSavingTips = [];
         let inBudgetSavingTipsSection = false;
 
-        lines.forEach((line, index) => {
+        lines.forEach((line) => {
             line = line.trim();
 
-            // Remove Markdown bold (**text**) and list markers (*)
             line = line.replace(/\*\*/g, "").replace(/\*/g, "").trim();
 
-            // Remove ## from the itinerary title (e.g., ## 3-Day Amritsar Cultural Immersion)
             if (line.startsWith("##")) {
                 line = line.replace("##", "").trim();
                 itineraryItems.push({ note: line });
                 return;
             }
 
-            // Check for day headings (e.g., "Day 1: ...")
             if (line.startsWith("Day")) {
                 currentDay = line;
                 inBudgetSavingTipsSection = false; // Reset section flag
                 itineraryItems.push({ day: currentDay, activities: [] });
             }
-            // Check for Budget Saving Tips
             else if (line.startsWith("Budget Saving Tips:")) {
                 currentDay = null; // Reset current day to avoid confusion with day activities
                 budgetSavingTips = []; // Reset budget saving tips
                 inBudgetSavingTipsSection = true; // Mark that we're in the Budget Saving Tips section
             }
-            // Check for numbered tips under Budget Saving Tips
             else if (inBudgetSavingTipsSection && line.match(/^\d+\./)) {
                 budgetSavingTips.push(line);
             }
-            // Add activities under the current day
             else if (line && currentDay && currentDay.startsWith("Day") && !inBudgetSavingTipsSection) {
                 itineraryItems[itineraryItems.length - 1].activities.push(line);
             }
-            // Handle general notes or sections
             else if (line && !line.startsWith("N/A") && !line.startsWith("Budget Saving Tips:") && !inBudgetSavingTipsSection) {
                 itineraryItems.push({ note: line });
             }
         });
 
-        // Add Budget Saving Tips as a separate section if they exist
         if (budgetSavingTips.length > 0) {
             itineraryItems.push({ section: "Budget Saving Tips:", details: budgetSavingTips });
         }

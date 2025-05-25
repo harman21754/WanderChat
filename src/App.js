@@ -161,9 +161,9 @@ const WanderChat = () => {
                         { name: "Manali", img: "https://www.clubmahindra.com/blog/media/section_images/blog-topic-6530ecb63a76c89.jpg", link: "https://www.google.com/search?q=manali" },
                         { name: "Shimla", img: "https://i0.wp.com/jannattravelguru.com/wp-content/uploads/2021/10/himachal-pradesh-shimla-147616947938o.webp", link: "https://www.google.com/search?q=shimla" },
                         { name: "Goa Beach", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6LzV3PwBVW52b-QcS87Xx2Dohv8_sEr--sA&s", link: "https://www.google.com/search?q=goa+beaches" },
-                        { name: "Jaipur", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn9GcRjcT9rS_ezSSzG9PRIRmMSh2zC85tzzurPNQ&s", link: "https://www.google.com/search?q=jaipur" },
+                        { name: "Jaipur", img: "https://res.cloudinary.com/odysseytraveller/image/fetch/f_auto,q_auto,dpr_auto,r_4,w_765,h_612,c_limit/https://cdn.odysseytraveller.com/app/uploads/2020/02/Amber-Fort.jpg", link: "https://www.google.com/search?q=jaipur" },
                         { name: "Kerala Backwaters", img: "https://miro.medium.com/v2/resize:fit:800/1*MGLoMtfmdM0uWvckntBlOA.png", link: "https://www.google.com/search?q=kerala+backwaters" },
-                        { name: "Darjeeling", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn9GcTADtryC1RUa9fkVQ1RqoxJ20bboW6IB3_UUQ&s", link: "https://www.google.com/search?q=darjeeling" },
+                        { name: "Darjeeling", img: "https://hikerwolf.com/wp-content/uploads/2020/04/Darjeeling-toy-train-route.jpg", link: "https://www.google.com/search?q=darjeeling" },
                     ].map((place, index) => (
                         <Col key={index} md={4} className="mb-3">
                             <Card className="shadow-sm">
