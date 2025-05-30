@@ -1,8 +1,7 @@
 import React from "react";
-import { Card, ListGroup} from "react-bootstrap";
+import { Card, ListGroup } from "react-bootstrap";
 
 const Itinerary = ({ itineraryData }) => {
-    // Parse the itinerary data and clean up Markdown formatting
     const parseItinerary = (data) => {
         const lines = data.split("\n");
         const itineraryItems = [];
@@ -12,7 +11,6 @@ const Itinerary = ({ itineraryData }) => {
 
         lines.forEach((line) => {
             line = line.trim();
-
             line = line.replace(/\*\*/g, "").replace(/\*/g, "").trim();
 
             if (line.startsWith("##")) {
@@ -23,27 +21,23 @@ const Itinerary = ({ itineraryData }) => {
 
             if (line.startsWith("Day")) {
                 currentDay = line;
-                inBudgetSavingTipsSection = false; // Reset section flag
+                inBudgetSavingTipsSection = false;
                 itineraryItems.push({ day: currentDay, activities: [] });
-            }
-            else if (line.startsWith("Budget Saving Tips:")) {
-                currentDay = null; // Reset current day to avoid confusion with day activities
-                budgetSavingTips = []; // Reset budget saving tips
-                inBudgetSavingTipsSection = true; // Mark that we're in the Budget Saving Tips section
-            }
-            else if (inBudgetSavingTipsSection && line.match(/^\d+\./)) {
-                budgetSavingTips.push(line);
-            }
-            else if (line && currentDay && currentDay.startsWith("Day") && !inBudgetSavingTipsSection) {
+            } else if (line.startsWith("Budget-Saving Tips:") || line.startsWith("Budget Saving Tips:")) {
+                currentDay = null;
+                budgetSavingTips = [];
+                inBudgetSavingTipsSection = true;
+            } else if (inBudgetSavingTipsSection && (line.match(/^\d+\./) || line.startsWith("📍"))) {
+                budgetSavingTips.push(line.replace("📍", "").trim());
+            } else if (line && currentDay && currentDay.startsWith("Day") && !inBudgetSavingTipsSection) {
                 itineraryItems[itineraryItems.length - 1].activities.push(line);
-            }
-            else if (line && !line.startsWith("N/A") && !line.startsWith("Budget Saving Tips:") && !inBudgetSavingTipsSection) {
+            } else if (line && !line.startsWith("N/A") && !line.startsWith("Budget-Saving Tips:") && !line.startsWith("Budget Saving Tips:") && !inBudgetSavingTipsSection) {
                 itineraryItems.push({ note: line });
             }
         });
 
         if (budgetSavingTips.length > 0) {
-            itineraryItems.push({ section: "Budget Saving Tips:", details: budgetSavingTips });
+            itineraryItems.push({ section: "Budget-Saving Tips", details: budgetSavingTips });
         }
 
         return itineraryItems;
@@ -56,9 +50,8 @@ const Itinerary = ({ itineraryData }) => {
             <h2 className="fw-bold mb-4 text-center">Your Itinerary</h2>
             {itineraryItems.map((item, index) => (
                 <div key={index} className="mb-4">
-                    {/* Day Section */}
                     {item.day && (
-                        <Card className="shadow-sm mb-3">
+                        <Card className="itinerary-section">
                             <Card.Header className="bg-primary text-white">
                                 <h4 className="mb-0">{item.day}</h4>
                             </Card.Header>
@@ -72,10 +65,9 @@ const Itinerary = ({ itineraryData }) => {
                             </ListGroup>
                         </Card>
                     )}
-                    {/* Budget Saving Tips Section */}
                     {item.section && (
-                        <Card className="shadow-sm mb-3">
-                            <Card.Header className="bg-success text-white">
+                        <Card className="itinerary-section">
+                            <Card.Header className="bg-budget-tips text-white">
                                 <h4 className="mb-0">{item.section}</h4>
                             </Card.Header>
                             <ListGroup variant="flush">
@@ -88,9 +80,8 @@ const Itinerary = ({ itineraryData }) => {
                             </ListGroup>
                         </Card>
                     )}
-                    {/* General Notes */}
                     {item.note && (
-                        <Card className="shadow-sm mb-3">
+                        <Card className="mb-3">
                             <Card.Body>
                                 <p className="mb-0">{item.note}</p>
                             </Card.Body>

@@ -10,6 +10,32 @@
     color: #fff;
 }
 
+.itinerary-section {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.itinerary-section .card-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 15px;
+}
+
+.itinerary-section .list-group-item {
+    background-color: transparent;
+    border: none;
+    padding: 10px 15px;
+    line-height: 1.5;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.bg-budget-tips {
+    background-color: #048f04;
+}
+
 .card {
     border: none;
     border-radius: 10px;
@@ -37,7 +63,7 @@
 }
 
 @media (max-width: 768px) {
-    .card {
+    .itinerary-section {
         margin: 0 15px;
     }
     .display-4 {
