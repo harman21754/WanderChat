@@ -164,7 +164,7 @@ const WanderChat = () => {
                 <h2 className="fw-bold">Popular Tourist Places in India</h2>
                 <Row className="justify-content-center mt-3">
                     {[
-                        { name: "Manali", img: "https://www.clubmahindra.com/blog/media/section_images/blog-topic-6530ecb63a76c89.jpg", link: "https://www.google.com/search?q=manali" },
+                        { name: "Manali", img: "https://i0.wp.com/www.easeindiatrip.com/blog/wp-content/uploads/2024/12/Manali-snow-fall-in-Winter-.jpg?resize=1200%2C702&ssl=1" },
                         { name: "Shimla", img: "https://i0.wp.com/jannattravelguru.com/wp-content/uploads/2021/10/himachal-pradesh-shimla-147616947938o.webp", link: "https://www.google.com/search?q=shimla" },
                         { name: "Goa Beach", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6LzV3PwBVW52b-QcS87Xx2Dohv8_sEr--sA&s", link: "https://www.google.com/search?q=goa+beaches" },
                         { name: "Jaipur", img: "https://res.cloudinary.com/odysseytraveller/image/fetch/f_auto,q_auto,dpr_auto,r_4,w_765,h_612,c_limit/https://cdn.odysseytraveller.com/app/uploads/2020/02/Amber-Fort.jpg", link: "https://www.google.com/search?q=jaipur" },
